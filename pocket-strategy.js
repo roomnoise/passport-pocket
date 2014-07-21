@@ -105,8 +105,14 @@ Strategy.prototype.authenticate = function(req, options) {
         }
 
         if(req.session.pocketData){
-            self.pass(req.session.pocketData.username, req.session.pocketData.info);
-        }else{        
+
+            if (self._options.passReqToCallback) {
+                self.pass(req, req.session.pocketData.username, req.session.pocketData.info);
+            } else {
+                self.pass(req.session.pocketData.username, req.session.pocketData.info);
+            }
+
+        }else{
             this._oauth.getOAuthAccessToken(req.session.pocketCode, function (err, username, accessToken) {
                 if(err || !username) { self.error(err); return}
                 req.session.pocketData = {
